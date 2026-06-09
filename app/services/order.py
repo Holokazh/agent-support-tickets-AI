@@ -1,6 +1,32 @@
 from typing import List, Dict, Any
 from app.database import get_db_cursor
 
+def get_all_orders() -> List[Dict[str, Any]]:
+    """
+    Récupère l'intégralité des commandes de la base.
+    Effectue une jointure pour inclure le nom du client.
+    """
+    with get_db_cursor() as cursor:
+        cursor.execute("""
+            SELECT o.id, o.client_id, c.nom, o.produit, o.prix, o.statut
+            FROM commandes o
+            JOIN clients c ON o.client_id = c.id
+            ORDER BY o.id DESC;
+        """)
+        rows = cursor.fetchall()
+
+        orders = []
+        for row in rows:
+            orders.append({
+                "id": row[0],
+                "client_id": row[1],
+                "client_nom": row[2],
+                "produit": row[3],
+                "prix": float(row[4]),
+                "statut": row[5]
+            })
+        return orders
+
 def get_customer_orders(client_id: int) -> List[Dict[str, Any]]:
     """
     Récupère l'historique des commandes d'un client spécifique.

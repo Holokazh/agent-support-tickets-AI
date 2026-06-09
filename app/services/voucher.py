@@ -1,6 +1,33 @@
 import os
 import uuid
+from typing import List, Dict, Any
 from app.database import get_db_cursor
+
+def get_all_vouchers() -> List[Dict[str, Any]]:
+    """
+    Récupère la liste de tous les bons d'achat générés en base.
+    """
+    with get_db_cursor() as cursor:
+        cursor.execute("""
+            SELECT v.id, v.client_id, c.nom, v.code, v.montant, v.statut, v.date_creation
+            FROM vouchers v
+            JOIN clients c ON v.client_id = c.id
+            ORDER BY v.id DESC;
+        """)
+        rows = cursor.fetchall()
+
+        vouchers = []
+        for row in rows:
+            vouchers.append({
+                "id": row[0],
+                "client_id": row[1],
+                "client_nom": row[2],
+                "code": row[3],
+                "montant": float(row[4]),
+                "statut": row[5],
+                "date_creation": row[6].isoformat() # On formate la date en chaîne ISO
+            })
+        return vouchers
 
 def generate_refund_voucher(client_id: int, amount: float) -> str:
     """
