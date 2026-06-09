@@ -16,5 +16,37 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+
+# --- SERVICE 2 : LE SERVEUR LLM LOCAL (Ollama) ---
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ast_ai_ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ast_ai_network
+
+  # --- SERVICE 3 : CONTENEUR D'INITIALISATION OLLAMA ---
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: ast_ai_ollama_init
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: [ "ollama", "pull", "qwen2.5:1.5b" ]
+    environment:
+      - OLLAMA_HOST=ollama
+    depends_on:
+      - ollama
+    networks:
+      - ast_ai_network
+
 volumes:
   postgres_data:
+  ollama_data:
+
+networks:
+  ast_ai_network:
+    driver: bridge
