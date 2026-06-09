@@ -1,5 +1,9 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # <-- [NOUVEAU] Import du middleware de sécurité CORS
+
+# Import de nos composants internes
 from app.mcp.server import mcp
+from app.controllers.api import router as api_router  # <-- [NOUVEAU] Import de notre routeur de dashboard
 
 # -------------------------------------------------------------
 # 1. INITIALISATION DE FASTAPI
@@ -11,7 +15,20 @@ app = FastAPI(
 )
 
 # -------------------------------------------------------------
-# 2. ROUTE REST STANDARD (Pour les humains)
+# 2. CONFIGURATION DU CORS (Sécurité Navigateur)
+# -------------------------------------------------------------
+# Ce middleware injecte les en-têtes HTTP requis pour autoriser des applications
+# tierces (comme notre futur front-end React) à interroger notre API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # En dev, on autorise tout. En production, on restreindrait à l'URL du front.
+    allow_credentials=True,
+    allow_methods=["*"],      # Autorise toutes les méthodes (GET, POST, PUT, DELETE)
+    allow_headers=["*"],      # Autorise tous les headers
+)
+
+# -------------------------------------------------------------
+# 3. ROUTE D'ACCUEIL REST
 # -------------------------------------------------------------
 @app.get("/")
 def read_root():
@@ -26,11 +43,14 @@ def read_root():
     }
 
 # -------------------------------------------------------------
-# 3. LE MONTAGE DU SERVEUR MCP (Pour l'IA)
+# 4. INCLUSION DES ROUTES REST (Dashboard)
 # -------------------------------------------------------------
-# La propriété 'mcp.app' est une application ASGI standard compatible Starlette/FastAPI.
-# En la montant sur '/mcp', FastAPI va router toutes les requêtes arrivant sur
-# '/mcp/*' (notamment '/mcp/sse' et '/mcp/messages') directement vers le moteur MCP.
+# Cette ligne active officiellement les routes du routeur (/api/tickets, /api/clients, etc.)
+app.include_router(api_router)
+
+# -------------------------------------------------------------
+# 5. MONTAGE DU SERVEUR MCP (IA)
+# -------------------------------------------------------------
 print("Montage du serveur MCP sur la route /mcp...")
 app.mount("/mcp", mcp.app)
 print("Serveur MCP monté et prêt !")
