@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+
+  # --- SERVICE 1 : LA BASE DE DONNÉES POSTGRESQL ---
+  db:
+    image: postgres:15-alpine
+    container_name: ast_ai_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ast_ai
+      POSTGRES_USER: ast_ai_user
+      POSTGRES_PASSWORD: ast_ai_password_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
