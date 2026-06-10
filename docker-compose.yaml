@@ -35,7 +35,7 @@ services:
     container_name: ast_ai_ollama_init
     volumes:
       - ollama_data:/root/.ollama
-    entrypoint: [ "ollama", "pull", "qwen2.5:1.5b" ]
+    entrypoint: [ "ollama", "pull", "qwen2.5:7b" ]
     environment:
       - OLLAMA_HOST=ollama
     depends_on:
