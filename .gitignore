@@ -11,3 +11,6 @@ wheels/
 
 # ENVIRONMENT
 .env
+
+# Voucher folder
+vouchers/
