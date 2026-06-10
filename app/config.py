@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     # VARIABLE DU LLM (Ollama)
     # -------------------------------------------------------------
     ollama_url: str = Field(default="http://localhost:11434", validation_alias="OLLAMA_URL")
+    ollama_model: str = Field(default="qwen2.5:7b", validation_alias="OLLAMA_MODEL")
 
     # -------------------------------------------------------------
     # CONFIGURATION DE PYDANTIC

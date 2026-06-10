@@ -2,6 +2,7 @@ import asyncio
 import ollama
 from mcp import ClientSession
 from mcp.client.sse import sse_client
+from app.config import settings
 
 # -------------------------------------------------------------
 # 1. FONCTION DE TRADUCTION DES OUTILS (MCP -> OLLAMA)
@@ -87,7 +88,7 @@ async def run_agent(ticket_message: str):
 
                 # Appel du modèle Ollama local
                 response = ollama.chat(
-                    model="qwen2.5:7b",
+                    model=settings.ollama_model,
                     messages=messages,
                     tools=ollama_tools
                 )
