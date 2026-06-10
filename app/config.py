@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------
     ollama_url: str = Field(default="http://localhost:11434", validation_alias="OLLAMA_URL")
     ollama_model: str = Field(default="qwen2.5:7b", validation_alias="OLLAMA_MODEL")
+    # -------------------------------------------------------------
+    # RÈGLES METIER & GARDE-FOUS (GUARDRAILS)
+    # -------------------------------------------------------------
+    vip_refund_percent: int = Field(default=20, validation_alias="VIP_REFUND_PERCENT")
+    allow_standard_refund: bool = Field(default=False, validation_alias="ALLOW_STANDARD_REFUND")
+
 
     # -------------------------------------------------------------
     # CONFIGURATION DE PYDANTIC
