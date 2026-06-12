@@ -2,6 +2,7 @@ from contextlib import contextmanager
 import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
 from app.config import settings
+from app.logger import logger
 
 # -------------------------------------------------------------
 # INITIALISATION DU POOL DE CONNEXIONS
@@ -9,15 +10,15 @@ from app.config import settings
 # minconn=1 : Le pool garde au moins 1 connexion ouverte en permanence.
 # maxconn=10 : Le pool peut ouvrir jusqu'à 10 connexions en parallèle si l'application subit une forte charge.
 try:
-    print("Initialisation du pool de connexions PostgreSQL...")
+    logger.info("Initialisation du pool de connexions PostgreSQL...")
     db_pool = ThreadedConnectionPool(
         minconn=1,
         maxconn=10,
         dsn=settings.database_url
     )
-    print("Pool de connexions PostgreSQL initialisé avec succès.")
+    logger.info("Pool de connexions PostgreSQL initialisé avec succès.")
 except Exception as e:
-    print(f"Erreur critique lors de l'initialisation du pool PostgreSQL : {e}")
+    logger.error(f"Erreur critique lors de l'initialisation du pool PostgreSQL : {e}")
     db_pool = None
 
 
@@ -39,7 +40,7 @@ def get_db_cursor():
     # [RÉSILIENCE] Si la connexion obtenue a été fermée par le serveur (timeout),
     # on la détruit proprement et on en demande une nouvelle toute neuve.
     if connection.closed != 0:
-        print("[DATABASE] Connexion obsolète détectée. Renouvellement de la connexion...")
+        logger.warning("Connexion obsolète détectée dans le pool. Renouvellement de la connexion...")
         db_pool.putconn(connection, close=True) # close=True détruit la connexion défectueuse
         connection = db_pool.getconn()
 
@@ -53,7 +54,7 @@ def get_db_cursor():
         # [RÉSILIENCE] Erreur de communication réseau ou connexion perdue en cours de route.
         # On ne fait pas de rollback (impossible car la connexion est déjà coupée).
         # On détruit la connexion dans le pool pour ne pas polluer les prochains appels.
-        print(f"[DATABASE ERROR] Connexion perdue pendant la requête : {e}. Recyclage...")
+        logger.error(f"Connexion perdue pendant la requête SQL : {e}. Recyclage de la connexion...")
         if cursor:
             try: cursor.close()
             except: pass

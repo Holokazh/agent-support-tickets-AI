@@ -4,17 +4,10 @@ import ollama
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 from app.config import settings
+from app.logger import setup_logger
 
-# -------------------------------------------------------------
-# CONFIGURATION DU LOGGING
-# -------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
-)
-logger = logging.getLogger("crm_agent")
-
+# Configuration du logger pour l'agent sous le namespace "ast-ai.agent"
+logger = setup_logger("ast-ai.agent")
 
 # -------------------------------------------------------------
 # 1. TRADUCTION DES OUTILS (MCP -> OLLAMA)
